@@ -1,6 +1,11 @@
 import inspect
 from functools import wraps
 
+import interactions
+import sims4
+from interactions.context import InteractionContext
+from interactions.priority import Priority
+from server_commands.argument_helpers import TunableInstanceParam
 from sims.sim import Sim
 
 
@@ -38,12 +43,11 @@ import services
 
 all_sims = [0]
 class monacalib:
-    """
     @inject(Sim,"on_add")
     def _name_changer(original, self, *args, **kwargs):
         self.sim_info.first_name = "Hacked"
         return original(self, *args, **kwargs)
-   """
+
     class sims:
         @staticmethod
         def getallsim():
@@ -62,6 +66,32 @@ class monacalib:
         def getsimfirstname(selectedsim: Sim):
             sim_info = selectedsim.sim_info
             return sim_info.first_name
+
+        @staticmethod
+        def push_interaction(affordance, target, sim, priority=Priority.High):
+            client = services.client_manager().get_first_client()
+            manager = services.affordance_manager()
+            resulta = affordance = manager.get(affordance)
+            if sim is not None:
+                    if not sim.queue.can_queue_visible_interaction():
+                        return False
+                    else:
+                        context = InteractionContext(sim, InteractionContext.SOURCE_PIE_MENU, priority, client=client,
+                                                     pick=None)
+                        result = sim.push_super_affordance(affordance, target, context)
+                        if not result:
+                            return "Faild for other error"
+                    return "Ok"
+            if target is None:
+                return "warn target is none"
+                if sim is None:
+                    return "error sim is none"
+                    if resulta is None:
+                        return "affrodance is not set"
+                        if manager is None:
+                            return "manager is not set"
+                            if client is None:
+                                return "client is not set"
 
     class game:
         @staticmethod
